@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "GymBeast",
+    "slug": "gymbeast",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "gymbeast",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#181B20"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#181B20"
+      },
+      "package": "com.gymbeast.app",
+      "versionCode": 1
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}
