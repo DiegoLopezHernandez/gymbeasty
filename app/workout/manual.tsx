@@ -21,6 +21,19 @@ export default function ManualWorkoutScreen() {
 
   const [name, setName] = useState('');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Date picker helpers
+  const parseDate = (iso: string) => {
+    const d = new Date(iso + 'T12:00:00');
+    return { day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() };
+  };
+  const fmtDisplay = (iso: string) => {
+    const { day, month, year } = parseDate(iso);
+    return `${String(day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}`;
+  };
+  const toISO = (day: number, month: number, year: number) =>
+    `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   const [durationH, setDurationH] = useState('1');
   const [durationM, setDurationM] = useState('0');
   const [selectedRoutine, setSelectedRoutine] = useState<string | null>(null);
@@ -118,8 +131,11 @@ export default function ManualWorkoutScreen() {
             value={name} onChangeText={setName} placeholder="Ej: Día de pecho, Pata..." placeholderTextColor={theme.textMuted} />
 
           <Text style={{ color:theme.textMuted, fontSize:11, fontWeight:'700', letterSpacing:0.8, marginBottom:6 }}>FECHA *</Text>
-          <TextInput style={{ backgroundColor:theme.bgElevated, borderWidth:1, borderColor:theme.border, borderRadius:Radius.md, padding:12, fontSize:15, color:theme.textPrimary, marginBottom: Spacing.md }}
-            value={date} onChangeText={setDate} placeholder="AAAA-MM-DD" placeholderTextColor={theme.textMuted} keyboardType="numbers-and-punctuation" />
+          <TouchableOpacity onPress={() => setShowDatePicker(true)}
+            style={{ backgroundColor:theme.bgElevated, borderWidth:1, borderColor:theme.border, borderRadius:Radius.md, padding:12, marginBottom:Spacing.md, flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
+            <Text style={{ color:theme.textPrimary, fontSize:15, fontWeight:'700' }}>{fmtDisplay(date)}</Text>
+            <Text style={{ fontSize:18 }}>📅</Text>
+          </TouchableOpacity>
 
           <Text style={{ color:theme.textMuted, fontSize:11, fontWeight:'700', letterSpacing:0.8, marginBottom:6 }}>DURACIÓN *</Text>
           <View style={{ flexDirection:'row', gap:10 }}>
@@ -268,6 +284,99 @@ export default function ManualWorkoutScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
+        </View>
+      </Modal>
+
+      {/* ── DATE PICKER MODAL ── */}
+      <Modal visible={showDatePicker} animationType="slide" transparent onRequestClose={() => setShowDatePicker(false)}>
+        <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.7)', justifyContent:'flex-end' }}>
+          <View style={{ backgroundColor:theme.bgCard, borderTopLeftRadius:24, borderTopRightRadius:24, padding:Spacing.lg, paddingBottom:40 }}>
+            <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
+              <Text style={{ color:theme.textPrimary, fontSize:20, fontWeight:'900' }}>📅 Seleccionar fecha</Text>
+              <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                <Text style={{ color:theme.textSecondary, fontSize:26 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            {(() => {
+              const { day: curDay, month: curMonth, year: curYear } = parseDate(date);
+              const daysInMonth = new Date(curYear, curMonth, 0).getDate();
+              const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+              const months = [
+                {n:1,l:'Enero'},{n:2,l:'Febrero'},{n:3,l:'Marzo'},{n:4,l:'Abril'},
+                {n:5,l:'Mayo'},{n:6,l:'Junio'},{n:7,l:'Julio'},{n:8,l:'Agosto'},
+                {n:9,l:'Septiembre'},{n:10,l:'Octubre'},{n:11,l:'Noviembre'},{n:12,l:'Diciembre'},
+              ];
+              const curYearN = new Date().getFullYear();
+              const years = Array.from({ length: 5 }, (_, i) => curYearN - 4 + i).reverse();
+
+              const selStyle = (active: boolean) => ({
+                paddingVertical: 10, paddingHorizontal: 6,
+                backgroundColor: active ? theme.primary + '22' : 'transparent',
+                borderRadius: Radius.sm,
+                borderWidth: active ? 1 : 0,
+                borderColor: active ? theme.primary + '60' : 'transparent',
+                marginBottom: 4,
+                alignItems: 'center' as const,
+              });
+              const selText = (active: boolean) => ({
+                color: active ? theme.primary : theme.textSecondary,
+                fontSize: active ? 16 : 14,
+                fontWeight: active ? '900' : '400' as any,
+              });
+
+              const pick = (d: number, m: number, y: number) => {
+                const maxD = new Date(y, m, 0).getDate();
+                const safeD = Math.min(d, maxD);
+                setDate(toISO(safeD, m, y));
+              };
+
+              return (
+                <View>
+                  {/* Column headers */}
+                  <View style={{ flexDirection:'row', marginBottom:8 }}>
+                    <Text style={{ flex:1, color:theme.textMuted, fontSize:11, fontWeight:'700', textAlign:'center', letterSpacing:0.8 }}>DÍA</Text>
+                    <Text style={{ flex:2, color:theme.textMuted, fontSize:11, fontWeight:'700', textAlign:'center', letterSpacing:0.8 }}>MES</Text>
+                    <Text style={{ flex:1.2, color:theme.textMuted, fontSize:11, fontWeight:'700', textAlign:'center', letterSpacing:0.8 }}>AÑO</Text>
+                  </View>
+                  <View style={{ flexDirection:'row', height:220 }}>
+                    {/* Days */}
+                    <ScrollView style={{ flex:1 }} showsVerticalScrollIndicator={false}>
+                      {days.map(d => (
+                        <TouchableOpacity key={d} style={selStyle(d === curDay)} onPress={() => pick(d, curMonth, curYear)}>
+                          <Text style={selText(d === curDay)}>{String(d).padStart(2,'0')}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                    {/* Divider */}
+                    <View style={{ width:1, backgroundColor:theme.border, marginHorizontal:4 }}/>
+                    {/* Months */}
+                    <ScrollView style={{ flex:2 }} showsVerticalScrollIndicator={false}>
+                      {months.map(m => (
+                        <TouchableOpacity key={m.n} style={selStyle(m.n === curMonth)} onPress={() => pick(curDay, m.n, curYear)}>
+                          <Text style={selText(m.n === curMonth)}>{m.l}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                    {/* Divider */}
+                    <View style={{ width:1, backgroundColor:theme.border, marginHorizontal:4 }}/>
+                    {/* Years */}
+                    <ScrollView style={{ flex:1.2 }} showsVerticalScrollIndicator={false}>
+                      {years.map(y => (
+                        <TouchableOpacity key={y} style={selStyle(y === curYear)} onPress={() => pick(curDay, curMonth, y)}>
+                          <Text style={selText(y === curYear)}>{y}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                  {/* Confirm */}
+                  <TouchableOpacity onPress={() => setShowDatePicker(false)}
+                    style={{ backgroundColor:theme.primary, borderRadius:Radius.md, paddingVertical:14, alignItems:'center', marginTop:16 }}>
+                    <Text style={{ color:'#fff', fontSize:15, fontWeight:'800' }}>✅ Confirmar — {fmtDisplay(date)}</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })()}
+          </View>
         </View>
       </Modal>
     </View>
