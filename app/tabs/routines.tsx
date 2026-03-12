@@ -5,7 +5,6 @@ import { useRouter } from 'expo-router';
 import { useGymStore } from '../../src/store/gymStore';
 import { Button, Badge, EmptyState, SectionHeader, useTheme } from '../../src/components/ui';
 import { Spacing, Radius, getShadow } from '../../src/constants/theme';
-import { EXERCISE_DB } from '../../src/constants/exercises';
 import { generateId } from '../../src/utils/calculations';
 import { Routine, RoutineExercise } from '../../src/types';
 
@@ -18,7 +17,7 @@ const MUSCLES = [
 export default function RoutinesScreen() {
   const router = useRouter();
   const theme = useTheme();
-  const { routines, addRoutine, updateRoutine, deleteRoutine, startWorkout } = useGymStore();
+  const { routines, addRoutine, updateRoutine, deleteRoutine, startWorkout, exercises: storeExercises } = useGymStore();
 
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -44,7 +43,7 @@ export default function RoutinesScreen() {
     setShowExPicker(false);
   };
 
-  const filteredEx = EXERCISE_DB.filter(e =>
+  const filteredEx = storeExercises.filter(e =>
     (!filterMuscle || e.primaryMuscle === filterMuscle) &&
     (!search || e.name.toLowerCase().includes(search.toLowerCase()))
   );
@@ -74,7 +73,7 @@ export default function RoutinesScreen() {
                   <Badge label={`${r.exercises.length} ejerc.`} color={theme.primary} />
                 </View>
                 {r.exercises.slice(0, 6).map((re, i) => {
-                  const ex = EXERCISE_DB.find(e => e.id === re.exerciseId);
+                  const ex = storeExercises.find(e => e.id === re.exerciseId);
                   return (
                     <View key={re.exerciseId} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: theme.border }}>
                       <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: theme.primary, marginRight: 10 }} />
@@ -137,7 +136,7 @@ export default function RoutinesScreen() {
             )}
 
             {exercises.map((re) => {
-              const ex = EXERCISE_DB.find(e => e.id === re.exerciseId);
+              const ex = storeExercises.find(e => e.id === re.exerciseId);
               return (
                 <View key={re.exerciseId} style={{ backgroundColor: theme.bgCard, borderRadius: Radius.md, padding: Spacing.md, marginBottom: 8, borderWidth: 1, borderColor: theme.border }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
