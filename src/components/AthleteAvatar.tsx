@@ -94,23 +94,19 @@ export const AthleteAvatar: React.FC<Props> = ({ tier, xp, totalWorkouts, streak
     <View style={{ backgroundColor:theme.bgCard, borderRadius:Radius.xl, borderWidth:1, borderColor:rank.color+'40', padding:Spacing.lg, alignItems:'center', overflow:'hidden', marginBottom:Spacing.md }}>
       <View style={{ position:'absolute', top:-40, width:260, height:260, borderRadius:130, backgroundColor:rank.color+Math.round((0.04+stage*0.025)*255).toString(16).padStart(2,'0') }}/>
 
-      {/* Header: level left, SECRET emoji right */}
-      <View style={{ flexDirection:'row', width:'100%', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+      {/* Header: nivel badge */}
+      <View style={{ flexDirection:'row', width:'100%', justifyContent:'flex-start', alignItems:'center', marginBottom:18 }}>
         <View style={{ backgroundColor:theme.bgElevated, borderRadius:Radius.sm, paddingHorizontal:10, paddingVertical:5, borderWidth:1, borderColor:theme.border }}>
           <Text style={{ color:theme.textMuted, fontSize:9, fontWeight:'700', letterSpacing:1 }}>NIVEL</Text>
           <Text style={{ color:rank.color, fontSize:22, fontWeight:'900', lineHeight:24 }}>{level}</Text>
         </View>
-        {/* Emoji grande — rango secreto, sin nombre */}
-        <View style={{ width:68, height:68, borderRadius:34, backgroundColor:rank.color+'1A', borderWidth:2, borderColor:rank.color+'50', alignItems:'center', justifyContent:'center', shadowColor:rank.color, shadowOffset:{width:0,height:0}, shadowOpacity:0.55, shadowRadius:14, elevation:10 }}>
-          <Text style={{ fontSize:38 }}>{rank.emoji}</Text>
-        </View>
       </View>
 
-      {/* Evolving figure */}
-      <Fig level={level} color={rank.color} dark={theme.mode==='dark'}/>
-
-      {/* Stage badge */}
-      <View style={{ backgroundColor:rank.color+'22', borderRadius:Radius.full, paddingHorizontal:12, paddingVertical:4, borderWidth:1, borderColor:rank.color+'45', marginTop:-4 }}>
+      {/* Emoji central grande — representación del nivel */}
+      <View style={{ width:130, height:130, borderRadius:65, backgroundColor:rank.color+'18', borderWidth:2, borderColor:rank.color+'50', alignItems:'center', justifyContent:'center', marginBottom:14, shadowColor:rank.color, shadowOffset:{width:0,height:0}, shadowOpacity:0.6, shadowRadius:20, elevation:12 }}>
+        <Text style={{ fontSize:72, lineHeight:80 }}>{rank.emoji}</Text>
+      </View>
+      <View style={{ backgroundColor:rank.color+'22', borderRadius:Radius.full, paddingHorizontal:12, paddingVertical:4, borderWidth:1, borderColor:rank.color+'45', marginBottom:4 }}>
         <Text style={{ color:rank.color, fontSize:11, fontWeight:'800' }}>{stageLabel} · Etapa {stage+1}/6</Text>
       </View>
 
